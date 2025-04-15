@@ -4,6 +4,7 @@ import { Lock, User, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 import Mainpage from '../users/Mainpage'
 import MainpageAdmin from '../admin/MainpageAdmin';
 import Preloader from './Preloader';
+import axios from 'axios';
 
 const ADMIN_CREDENTIALS = [
   { username: 'admin', password: 'admin123' },
@@ -37,9 +38,21 @@ const Login = () => {
     }
   };
 
-  const handleUserView = () => {
-    setIsLoggedIn(true);
-    setUserType('people');
+  const handleUserLogin= async() => {
+    try {
+      console.log({username,password})
+      const response = await axios.post("http://localhost:5000/api/auth/login", { username, password });
+      console.log("Login Success");
+      if (response.data.token) {
+        sessionStorage.setItem("token", response.data.token);
+        // localStorage.setItem("userId",response.data.user_id);
+      }  
+      setIsLoggedIn(true);
+      setUserType('people');
+    }
+    catch (error) {
+      console.error("Login Error:", error.response?.data || error.message);
+    }
   };
 
   const handleLogout = () => {
@@ -53,6 +66,7 @@ const Login = () => {
   if (isLoading) {
     return <Preloader />;
   }
+  
 
   if (isLoggedIn) {
     return userType === 'admin' ? (
@@ -72,7 +86,7 @@ const Login = () => {
       >
         <div className="text-center mb-4">
           <ShieldCheck size={48} className="mx-auto mb-2 text-white" />
-          <h2 className="text-2xl font-bold">Secure Access Control</h2>
+          <h2 className="text-2xl font-bold">Login here!</h2>
         </div>
 
         {!userType && (
@@ -175,7 +189,7 @@ const Login = () => {
           animate={{ opacity: 1, y: 0 }}
           onSubmit={e => {
             e.preventDefault();
-            handleUserView();
+            handleUserLogin();
           }}
           className="space-y-4"
         >

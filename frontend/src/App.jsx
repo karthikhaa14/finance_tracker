@@ -10,7 +10,7 @@ const App = () => {
   useEffect(() => {
     const welcomeTimer = setTimeout(() => {
       setAppState('welcome');
-    }, 3000);
+    }, 2000);
 
     const loginTimer = setTimeout(() => {
       setAppState('login');

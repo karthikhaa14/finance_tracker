@@ -12,7 +12,7 @@ const UserManagement = () => {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/users');
+      const res = await axios.get('http://localhost:5000/api/users/');
       setUsers(res.data);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -30,7 +30,7 @@ const UserManagement = () => {
         await axios.put(`http://localhost:5000/api/users/${editingUserId}`, form);
         setEditingUserId(null);
       } else {
-        await axios.post('http://localhost:5000/api/users', form);
+        await axios.post('http://localhost:5000/api/users/', form);
       }
       setForm({ username: '', email: '', password: '', role: 'user' });
       fetchUsers();

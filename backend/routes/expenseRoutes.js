@@ -7,22 +7,23 @@ const {
   deleteExpense,
   getExpensesByUser,
 } = require('../controllers/expenseController');
+const authMiddleware=require('../middleware/authMiddleware')
 
 
 
 // Create a new expense
-router.post('/', createExpense);
+router.post('/', authMiddleware,createExpense);
 
 // Get a specific expense by ID
-router.get('/:id', getExpense);
+router.get('/:id',authMiddleware, getExpense);
 
 // Get all expenses for a specific user by user_id
 router.get('/user/:user_id',getExpensesByUser);
 
 // Update an expense by ID
-router.put('/:id', updateExpense);
+router.put('/:id',authMiddleware, updateExpense);
 
 // Delete an expense by ID
-router.delete('/:id', deleteExpense);
+router.delete('/:id',authMiddleware, deleteExpense);
 
 module.exports = router;

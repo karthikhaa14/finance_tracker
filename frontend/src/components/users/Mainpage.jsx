@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import axios from 'axios';
 import {
   BookOpen,
   Users,
@@ -16,27 +17,62 @@ import Income from './Income'
 import Expense from './Expense'
 import Chatbot from './Chatbot'
 import Preloader from '../common/Preloader';
+import RequestChatbot from './RequestChatbot';
+import {jwtVerify} from 'jose'
 
+
+let payloadData;
 const MainPagePeople = ({ onLogout }) => {
   const [selectedComponent, setSelectedComponent] = useState('dashboard');
   const [isLoading, setIsLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [permissions, setPermissions] = useState({
+    dash: false,
+    inc: false,
+    exp: false,
+    chat: false
+  });
+  
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 5000);
-    return () => clearTimeout(timer);
+  useEffect( () => {
+    const fetchPermissions = async () => {
+      try {
+        const token= sessionStorage.getItem('token');
+        const secret = new TextEncoder().encode("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9");
+        const {payload} = await jwtVerify(token, secret)
+        payloadData = payload
+        if (!token) {
+          throw new Error('No authentication token found');
+        }
+        const response = await axios.get(`http://localhost:5000/api/permissions/${payload.userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        setPermissions({
+          dash: response.data.dashboard_access,
+          inc: response.data.income_access,
+          exp: response.data.expense_access,
+          chat: response.data.chatbot_access
+        });
+      } catch (error) {
+        console.error('Error fetching permissions:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchPermissions();
   }, []);
 
   if (isLoading) return <Preloader />;
 
   const renderComponent = () => {
     switch (selectedComponent) {
-      case 'dashboard': return <Dashboard />;
-      case 'income': return <Income />;
+      case 'dashboard': return <Dashboard userId={payloadData.userId}/>;
+      case 'income': return <Income userId={payloadData.userId} />;
       case 'expense': return <Expense />;
       case 'chatbot': return <Chatbot />;
+      case 'request': return <RequestChatbot />;
       default: return <Dashboard />;
     }
   };
@@ -61,34 +97,41 @@ const MainPagePeople = ({ onLogout }) => {
         </motion.div>
 
         <div className="flex-1 px-2 py-4 space-y-1">
-          <SidebarItem
+          {permissions.dash && <SidebarItem
             icon={<BookOpen size={20} />}
             text="Dashboard"
             active={selectedComponent === 'dashboard'}
             onClick={() => setSelectedComponent('dashboard')}
             isOpen={isSidebarOpen}
-          />
-          <SidebarItem
+          />}
+          {permissions.inc&& <SidebarItem
             icon={<Users size={20} />}
             text="Income"
             active={selectedComponent === 'income'}
             onClick={() => setSelectedComponent('income')}
             isOpen={isSidebarOpen}
-          />
-          <SidebarItem
+          />}
+          {permissions.exp&&<SidebarItem
             icon={<Shield size={20} />}
             text="Expense"
             active={selectedComponent === 'expense'}
             onClick={() => setSelectedComponent('expense')}
             isOpen={isSidebarOpen}
-          />
-          <SidebarItem
+          />}
+          {permissions.chat&&<SidebarItem
             icon={<MessageCircleQuestion size={20} />}
             text="Chatbot"
             active={selectedComponent === 'chatbot'}
             onClick={() => setSelectedComponent('chatbot')}
             isOpen={isSidebarOpen}
-          />
+          />}
+          {!permissions.chat &&<SidebarItem
+            icon={<MessageCircleQuestion size={20} />}
+            text="Request for Chatbot"
+            active={selectedComponent === 'request'}
+            onClick={() => setSelectedComponent('request')}
+            isOpen={isSidebarOpen}
+          />}
         </div>
 
         <div className="px-2 pb-4">

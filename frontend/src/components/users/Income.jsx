@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-const Income = () => {
+const Income = ({userId}) => {
   const [showForm, setShowForm] = useState(false);
   const [incomes, setIncomes] = useState([]);
   const [formData, setFormData] = useState({ amount: '', source: '', date: '' });
@@ -14,7 +14,7 @@ const Income = () => {
   const handleSave = async() => {
     if (formData.amount && formData.source && formData.date) {
       try {
-        const response = await axios.post("http://localhost:5000/api/incomes/", formData);
+        const response = await axios.post(`http://localhost:5000/api/incomes/${userId}`, formData);
         setIncomes((prev) => [...prev, response.data]);
         setFormData({ amount: '', source: '', date: '' });
         setShowForm(false);
@@ -24,17 +24,63 @@ const Income = () => {
     }
   };
 
-  const handleDelete = (id) => {
-    setIncomes(incomes.filter((income) => income.id !== id));
-  };
+  
+const handleDelete = async (id) => {
+  try {
+    const response = await axios.delete(`http://localhost:5000/api/incomes/${id}`, {
+      headers: {
+        Authorization: `Bearer ${sessionStorage.getItem('token')}`
+      }
+    });
+    
+    // Only update local state if database deletion was successful
+    if (response.status === 204) {
+      setIncomes(incomes.filter((income) => income.id !== id));
+    }
+  } catch (error) {
+    console.error('Error deleting income:', error);
+    // Optionally show error to user
+  }
+};
 
-  const handleEdit = (id) => {
-    const incomeToEdit = incomes.find((income) => income.id === id);
+const handleEdit = async (id) => {
+  try {
+    // First fetch the income to edit from database
+    const response = await axios.get(`http://localhost:5000/api/incomes/${id}`, {
+      headers: {
+        Authorization: `Bearer ${sessionStorage.getItem('token')}`
+      }
+    });
+    
+    const incomeToEdit = response.data;
+    
+    // Update local state
     setFormData(incomeToEdit);
     setIncomes(incomes.filter((income) => income.id !== id));
     setShowForm(true);
     setShowIncomeList(false);
-  };
+  } catch (error) {
+    console.error('Error fetching income to edit:', error);
+    // Optionally show error to user
+  }
+};
+const viewIncome= async(userId)=>{
+    try{
+      const response= await axios.get(`http://localhost:5000/api/incomes/user/${userId}`,{
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`
+        }
+      });
+      setIncomes((prev) => [...prev, response.data]);
+      setFormData({ amount: '', source: '', date: '' });
+      setShowIncomeList(true);
+    }
+    catch (error) {
+      console.error('Error fetching income to edit:', error);
+      // Optionally show error to user
+    }
+}
+
 
   const handleBack = () => {
     setShowIncomeList(false);
@@ -51,7 +97,7 @@ const Income = () => {
         }
         {incomes.length > 0 && (
           <>
-            <button onClick={() => setShowIncomeList(true)} className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded">
+            <button onClick={() => viewIncome(userId)} className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded">
               View Income </button>
             <button onClick={() => alert('Downloading income...')}  className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">
               Download Income </button>

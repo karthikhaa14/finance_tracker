@@ -14,19 +14,17 @@ const createPermissions = async (req, res) => {
   }
 };
 
-// Get Permissions by User ID
 const getPermissions = async (req, res) => {
   const { user_id } = req.params;
   try {
-    const result = await pool.query('SELECT * FROM permissions WHERE user_id = $1', [user_id]);
-    if (result.rows.length === 0) return res.status(404).json({ error: 'Permissions not found' });
+    const result = await pool.query('SELECT dashboard_access, income_access, expense_access, chatbot_access FROM permissions WHERE user_id = $1', [user_id]);
+    if (result.rows.length === 0) { return res.status(404).json({ error: 'Permissions not found' });}
     res.json(result.rows[0]);
   } catch (error) {
     res.status(500).json({ error: 'Error fetching permissions' });
   }
 };
 
-// Update Permissions (for chatbot access)
 const updatePermissions = async (req, res) => {
   const { user_id } = req.params;
   const { chatbot_access } = req.body;

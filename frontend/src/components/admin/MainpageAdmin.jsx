@@ -11,13 +11,15 @@ import {
   X,
   Menu
 } from 'lucide-react';
-import Dashboard from './Dashboard'
+
 import UserManagement from './UserManagement'
 import PermissionManagement from './PermissionManagement'
-import Chatbot from './Chatbot'
+import Requestscomponent from './Requestscomponent'
+
 import Preloader from '../common/Preloader';
+
 const MainpageAdmin = ({ onLogout }) => {
-    const [selectedComponent, setSelectedComponent] = useState('dashboard');
+    const [selectedComponent, setSelectedComponent] = useState('user management');
     const [isLoading, setIsLoading] = useState(true);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   
@@ -32,10 +34,9 @@ const MainpageAdmin = ({ onLogout }) => {
   
     const renderComponent = () => {
       switch (selectedComponent) {
-        case 'dashboard': return <Dashboard />;
         case 'user management': return <UserManagement/>;
         case 'permission management': return <PermissionManagement />;
-        case 'chatbot': return <Chatbot />;
+        case 'request':return <Requestscomponent />
         default: return <Dashboard />;
       }
     };
@@ -60,13 +61,7 @@ const MainpageAdmin = ({ onLogout }) => {
           </motion.div>
   
           <div className="flex-1 px-2 py-4 space-y-1">
-            <SidebarItem
-              icon={<BookOpen size={20} />}
-              text="Dashboard"
-              active={selectedComponent === 'dashboard'}
-              onClick={() => setSelectedComponent('dashboard')}
-              isOpen={isSidebarOpen}
-            />
+            
             <SidebarItem
               icon={<Users size={20} />}
               text="User Management"
@@ -82,10 +77,10 @@ const MainpageAdmin = ({ onLogout }) => {
               isOpen={isSidebarOpen}
             />
             <SidebarItem
-              icon={<MessageCircleQuestion size={20} />}
-              text="Chatbot"
-              active={selectedComponent === 'chatbot'}
-              onClick={() => setSelectedComponent('chatbot')}
+              icon={<Shield size={20} />}
+              text="Requests"
+              active={selectedComponent === 'request'}
+              onClick={() => setSelectedComponent('request')}
               isOpen={isSidebarOpen}
             />
           </div>
