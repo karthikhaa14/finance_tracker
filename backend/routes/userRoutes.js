@@ -7,7 +7,7 @@ const authMiddleware=require('../middleware/authMiddleware')
 router.post('/',createUser); // Create user
 router.get('/:id', authMiddleware,getUser);   // Get user by ID
 router.put('/:id', updateUser); // Update user by ID
-router.delete('/:id',authMiddleware, deleteUser);
+router.delete('/:id', deleteUser);
 router.get('/',getAllUsers) // Delete user by ID
 
 module.exports = router;

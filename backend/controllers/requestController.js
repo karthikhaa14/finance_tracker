@@ -5,13 +5,14 @@ const getRequests= async (req,res)=>{
         const response= await pool.query(`
             SELECT r.*, u.username ,u.role
             FROM requests r
-            JOIN users u ON r.user_id = u.user_id
+            JOIN users u ON r.user_id = u.id
             WHERE r.request_status = 'pending'
         `)
-        // if (response.rows.length === 0) return res.status(404).json({ error: 'Request not found' });
-        res.json("response");
+        //if (response.rows.length === 0) return res.status(404).json({ error: 'Request not found' });
+        res.json(response.rows);
     }
     catch (error) {
+      console.log(error);
         res.status(500).json({ error: 'Error fetching requests' });
       }
 };
@@ -19,13 +20,14 @@ const getRequests= async (req,res)=>{
 const createRequest= async (req,res)=>{
     const {user_id,request_type}= req.body;
     try{
-        const query=`INSERT INTO permissions (user_id,request_type,request_status)
-                     VALUES ($1, $2,pending) RETURNING *`;
+        const query=`INSERT INTO requests (user_id,request_type,request_status)
+                     VALUES ($1, $2,'pending') RETURNING *`;
         const values=[user_id,request_type];
         const response=await pool.query(query,values);
-        res.status(201).json(result.rows[0]);
+        res.status(201).json(response.rows[0]);
     }
     catch (error) {
+      console.log(error);
         res.status(500).json({ error: 'Error creating permissions' });
       }
 };

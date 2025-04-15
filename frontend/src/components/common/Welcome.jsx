@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Lock, Camera, Shield, Search } from 'lucide-react';
+import { LayoutDashboard,  TrendingUp,Wallet,Bot} from 'lucide-react';
 
 const Welcome = () => {
   const iconVariants = {
@@ -14,7 +14,7 @@ const Welcome = () => {
         <motion.h1
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.6 }}
           className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6"
         >
           FinanceFlow Tracker
@@ -23,7 +23,7 @@ const Welcome = () => {
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.8 }}
+          transition={{ delay: 0.3, duration: 0.6}}
           className="text-lg md:text-xl mb-10"
         >
          Smart Budgeting and Expense Insights to Help You Take Control of Your Money
@@ -31,10 +31,10 @@ const Welcome = () => {
 
         <div className="flex justify-center flex-wrap gap-8 mb-12">
           {[
-            { Icon: Camera, label: 'High-Resolution Capture' },
-            { Icon: Shield, label: 'Real-Time Protection' },
-            { Icon: Search, label: 'Intelligent Tracking' },
-            { Icon: Lock, label: 'Secure Authentication' },
+            { Icon: LayoutDashboard, label: 'Smart Finance Overview' },
+            { Icon: TrendingUp, label: 'Boosted Income Insights' },
+            { Icon: Wallet, label: 'Expense Mastery Tools' },
+            { Icon: Bot, label: 'AI-Powered Assistant' }
           ].map(({ Icon, label }) => (
             <motion.div
               key={label}
@@ -49,7 +49,7 @@ const Welcome = () => {
           ))}
         </div>
 
-        <motion.div
+        {/* <motion.div
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 1, duration: 0.5 }}
@@ -57,8 +57,8 @@ const Welcome = () => {
           {/* Uncomment below button if needed */}
           {/* <button className="px-6 py-2 border border-white text-white rounded-lg hover:bg-white hover:text-[#1a2980] transition">
             Get Started
-          </button> */}
-        </motion.div>
+          </button> 
+        </motion.div> */}
       </div>
     </div>
   );

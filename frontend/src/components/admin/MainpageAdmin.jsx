@@ -13,9 +13,8 @@ import {
 } from 'lucide-react';
 
 import UserManagement from './UserManagement'
-import PermissionManagement from './PermissionManagement'
 import Requestscomponent from './Requestscomponent'
-
+import UsersList from './UsersList';
 import Preloader from '../common/Preloader';
 
 const MainpageAdmin = ({ onLogout }) => {
@@ -35,7 +34,7 @@ const MainpageAdmin = ({ onLogout }) => {
     const renderComponent = () => {
       switch (selectedComponent) {
         case 'user management': return <UserManagement/>;
-        case 'permission management': return <PermissionManagement />;
+        case 'users list': return <UsersList/>;
         case 'request':return <Requestscomponent />
         default: return <Dashboard />;
       }
@@ -70,10 +69,10 @@ const MainpageAdmin = ({ onLogout }) => {
               isOpen={isSidebarOpen}
             />
             <SidebarItem
-              icon={<Shield size={20} />}
-              text="Permission Management"
-              active={selectedComponent === 'permission management'}
-              onClick={() => setSelectedComponent('permission management')}
+              icon={<Users size={20} />}
+              text="Users"
+              active={selectedComponent === 'users list'}
+              onClick={() => setSelectedComponent('users list')}
               isOpen={isSidebarOpen}
             />
             <SidebarItem

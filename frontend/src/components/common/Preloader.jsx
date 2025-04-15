@@ -8,7 +8,7 @@ const Preloader = () => {
       scale: [1, 1.2, 1],
       rotate: [0, 360],
       transition: {
-        duration: 2,
+        duration: 1.5,
         repeat: Infinity,
         ease: 'easeInOut',
       },
@@ -54,7 +54,7 @@ const Preloader = () => {
           animate={{
             scale: [1, 1.2, 1],
             transition: {
-              duration: 1,
+              duration: 0.7,
               repeat: Infinity,
               delay: 0.6,
             },

@@ -2,11 +2,11 @@ const pool = require('../db'); // Import the DB configuration
 
 // Create Permissions (for chatbot access)
 const createPermissions = async (req, res) => {
-  const { user_id, chatbot_access } = req.body;
+  const { user_id,dashboard_access,income_access,expense_access, chatbot_access } = req.body;
   try {
     const query = `INSERT INTO permissions (user_id, dashboard_access,income_access,expense_access,chatbot_access)
-                   VALUES ($1,true,true,true, $2) RETURNING *`;
-    const values = [user_id, chatbot_access];
+                   VALUES ($1,$2,$3,$4, $5) RETURNING *`;
+    const values = [user_id,dashboard_access,income_access,expense_access, chatbot_access];
     const result = await pool.query(query, values);
     res.status(201).json(result.rows[0]);
   } catch (error) {

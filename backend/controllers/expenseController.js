@@ -2,13 +2,15 @@ const pool = require('../db'); // Import the DB configuration
 
 // Create Expense
 const createExpense = async (req, res) => {
-  const { user_id, category, description, amount, date } = req.body;
+  const {user_id}=req.params;
+  const {  category, amount, date } = req.body;
   try {
     const query = `INSERT INTO expenses (user_id, category, amount, date)
                    VALUES ($1, $2, $3, $4) RETURNING *`;
-    const values = [user_id, category, description, amount, date];
+    const values = [user_id, category,  amount, date];
     const result = await pool.query(query, values);
     res.status(201).json(result.rows[0]);
+    console.log("success")
   } catch (error) {
     res.status(500).json({ error: 'Error creating expense' });
   }

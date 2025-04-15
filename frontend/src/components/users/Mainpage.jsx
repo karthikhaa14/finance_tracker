@@ -67,13 +67,14 @@ const MainPagePeople = ({ onLogout }) => {
   if (isLoading) return <Preloader />;
 
   const renderComponent = () => {
+    if (!payloadData) return null;
     switch (selectedComponent) {
       case 'dashboard': return <Dashboard userId={payloadData.userId}/>;
       case 'income': return <Income userId={payloadData.userId} />;
-      case 'expense': return <Expense />;
+      case 'expense': return <Expense userId={payloadData.userId}/>;
       case 'chatbot': return <Chatbot />;
-      case 'request': return <RequestChatbot />;
-      default: return <Dashboard />;
+      case 'request': return <RequestChatbot userId={payloadData.userId} />;
+      default: return <Dashboard userId={payloadData.userId} />;
     }
   };
 

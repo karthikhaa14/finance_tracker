@@ -3,12 +3,12 @@ const pool = require('../db'); // Import the DB configuration
 // Create Income
 const createIncome = async (req, res) => {
   const { source, amount, date } = req.body;
-  const {id} = req.params;
-  console.log(id);
+  const {user_id} = req.params;
+  //console.log(id);
   try {
     const query = `INSERT INTO incomes (user_id, source, amount, date)
                    VALUES ($1, $2, $3, $4) RETURNING *`;
-    const values = [id, source, amount, date];
+    const values = [user_id, source, amount, date];
     const result = await pool.query(query, values);
     res.status(201).json(result.rows[0]);
   } catch (error) {

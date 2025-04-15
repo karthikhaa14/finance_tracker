@@ -19,7 +19,7 @@ app.use('/api/expenses', expenseRoutes);
 app.use('/api/incomes', incomeRoutes);
 app.use('/api/permissions', permissionRoutes);
 app.use('/api/auth',authRoutes);
-app.use('api/requests',requestRoutes);
+app.use('/api/requests',requestRoutes);
 
 // Start the server
 const PORT = process.env.PORT||5000 ;

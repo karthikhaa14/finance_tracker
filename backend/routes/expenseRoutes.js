@@ -12,7 +12,7 @@ const authMiddleware=require('../middleware/authMiddleware')
 
 
 // Create a new expense
-router.post('/', authMiddleware,createExpense);
+router.post('/:user_id', authMiddleware,createExpense);
 
 // Get a specific expense by ID
 router.get('/:id',authMiddleware, getExpense);

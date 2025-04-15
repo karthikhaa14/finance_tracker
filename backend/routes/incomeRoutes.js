@@ -11,7 +11,7 @@ const {
 const authMiddleware=require('../middleware/authMiddleware')
 
 // Create a new income
-router.post('/:id',createIncome);
+router.post('/:user_id',createIncome);
 
 // Get a specific income by ID
 router.get('/:id',authMiddleware, getIncome);
