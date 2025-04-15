@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "jose": "^6.0.10",
-    "recharts": "^2.15.2"
-  }
-}
