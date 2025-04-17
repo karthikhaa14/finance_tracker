@@ -13,13 +13,10 @@ import {
   Menu
 } from 'lucide-react';
 
-// import UserManagement from './UserManagement'
-// import Requestscomponent from './Requestscomponent'
-// import UsersList from './UsersList';
 import Preloader from '../common/Preloader';
 
 const MainpageAdmin = () => {
-  const Navigate =useNavigate();
+  const navigate =useNavigate();
     const [selectedComponent, setSelectedComponent] = useState('user management');
     const [isLoading, setIsLoading] = useState(true);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -27,14 +24,14 @@ const MainpageAdmin = () => {
     useEffect(() => {
       const timer = setTimeout(() => {
         setIsLoading(false);
-      }, 5000);
+      }, 2000);
+      navigate('/admin/user_management');
       return () => clearTimeout(timer);
-      Navigate('/admin/user_management');
     }, []);
   
     if (isLoading) return <Preloader />;
     const handleLogout=()=>{
-      Navigate('/');
+      navigate('/');
     }
   
     return (

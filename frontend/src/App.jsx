@@ -14,7 +14,7 @@ import RequestChatbot from './components/users/RequestChatbot.jsx';
 import MainpageAdmin from './components/admin/MainpageAdmin.jsx';
 import UserManagement from './components/admin/UserManagement.jsx';
 import UsersList from './components/admin/UsersList.jsx';
-import RequestsComponent from './components/admin/RequestsComponent.jsx';
+import RequestsComponent from './components/admin/Requestscomponent.jsx';
 
 const App = () => {
   return(

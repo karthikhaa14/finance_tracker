@@ -70,7 +70,6 @@ const Requestscomponent = () => {
                             <th className="px-6 py-3">Username</th>
                             <th className="px-6 py-3">Request Type</th>
                             <th className="px-6 py-3">Role</th>
-                            <th className="px-6 py-3">Status</th>
                             <th className="px-6 py-3 text-center">Actions</th>
                         </tr>
                     </thead>
@@ -80,7 +79,6 @@ const Requestscomponent = () => {
                                 <td className="px-6 py-4 font-medium text-gray-800">{request.username}</td>
                                 <td className="px-6 py-4">{request.request_type}</td>
                                 <td className="px-6 py-4 capitalize">{request.role}</td>
-                                <td className="px-6 py-4 capitalize font-medium">{request.request_status}</td>
                                 <td className="px-6 py-4 text-center space-x-2">
                                     {request.request_status === 'pending' ? (
                                         <>

@@ -2,8 +2,8 @@ const jwt = require("jsonwebtoken");
 
 const authMiddleware = (req, res, next) => {
     
-  const token = req.cookies?.token || req.header("Authorization")?.replace("Bearer ", "");
-  console.log(token)
+  const token =  req.header("Authorization")?.replace("Bearer ", "");
+  //console.log(token)
 
   if (!token) {
     return res.status(401).json({ error: "Access denied. No token provided." });
@@ -17,5 +17,6 @@ const authMiddleware = (req, res, next) => {
     res.status(403).json({ error: "Invalid token" });
   }
 };
+
 
 module.exports = authMiddleware;

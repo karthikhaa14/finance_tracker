@@ -5,13 +5,10 @@ import Preloader from './Preloader';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom'; 
 
-const ADMIN_CREDENTIALS = [
-  { username: 'admin', password: 'admin123' },
-];
-
+import {jwtDecode} from 'jwt-decode';
 const Login = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const [userType, setUserType] = useState(null);
+  const [login, setLogin] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -25,30 +22,32 @@ const Login = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleAdminLogin = () => {
-    const validUser = ADMIN_CREDENTIALS.find(
-      cred => cred.username === username && cred.password === password
-    );
-    if (validUser) {
-      navigate('/admin'); // 👈 navigate to admin page
-    } else {
-      setError('Invalid Credentials');
-    }
-  };
-
-  const handleUserLogin = async () => {
+  const handleLogin = async () => {
     try {
       const response = await axios.post("http://localhost:5000/api/auth/login", { username, password });
-      if (response.data.token) {
-        sessionStorage.setItem("token", response.data.token);
+      const token = response.data.token;
+      if (!token) {
+        setError('Invalid Credentials');
+        return;
       }
-      navigate('/user'); // 
-    } catch (error) {
+      if (token) {
+        sessionStorage.setItem("token", token);
+      }
+      const decoded = jwtDecode(token);
+      if (decoded.role === 'admin') {
+          navigate('/admin');
+      } 
+      else {
+      navigate('/user'); 
+      }// 
+    } 
+    catch (error) {
       console.error("Login Error:", error.response?.data || error.message);
       setError('Invalid Credentials');
     }
-  };
+  }
 
+  
   if (isLoading) {
     return <Preloader />;
   }
@@ -66,7 +65,7 @@ const Login = () => {
           <h2 className="text-2xl font-bold">Login here!</h2>
         </div>
 
-        {!userType && (
+        {!login && (
           <motion.div className="text-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
             <h4 className="mb-4 text-white text-lg">Select User Type</h4>
             <div className="flex justify-center gap-4">
@@ -74,29 +73,22 @@ const Login = () => {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
-                onClick={() => setUserType('admin')}
+                onClick={() => setLogin(true)}
               >
-                Admin Login
+                Login
               </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
-                onClick={() => setUserType('people')}
-              >
-                User Login
-              </motion.button>
+             
             </div>
           </motion.div>
         )}
 
-        {(userType === 'admin' || userType === 'people') && (
+        {(login) && (
           <motion.form
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             onSubmit={e => {
               e.preventDefault();
-              userType === 'admin' ? handleAdminLogin() : handleUserLogin();
+               handleLogin();
             }}
             className="space-y-4"
           >

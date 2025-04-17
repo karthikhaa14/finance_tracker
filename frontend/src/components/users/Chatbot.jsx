@@ -33,13 +33,15 @@ const Chatbot = () => {
     setQuery('');
  
     try {
-const res = await axios.post('http://localhost:5000/api/bot/ask', {
+      const res = await axios.post('http://localhost:5000/api/bot/ask', {
         query,
-        data: excelData,
+        data: excelData},
+        {
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-          },
-      });
+          }
+        }
+      );
       const botMessage = { text: res.data.answer, sender: 'bot' };
       //console.log(botMessage)
       setMessages((prev) => [...prev, botMessage]);

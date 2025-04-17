@@ -2,23 +2,29 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { CheckCircle, AlertCircle } from 'lucide-react';
 import { useOutletContext } from 'react-router-dom';
-
 const RequestChatbot = () => {
-  const context= useOutletContext();
-    const userId=context.userId;
+  const context = useOutletContext();
+  const userId = context.userId;
+  console.log(userId)
   const [requestStatus, setRequestStatus] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
+  const [buttondisabled,setButtonDisabled] = useState(false);
 
   const handleRequestChatbot = async () => {
+   
     try {
-      const response = await axios.post(`http://localhost:5000/api/requests/${userId}`, {
+      const response = await axios.post(`http://localhost:5000/api/requests/`, {
         user_id: userId,
         request_type: 'chatbot_access', headers: {
           Authorization: `Bearer ${sessionStorage.getItem('token')}`,
         },
       });
       setRequestStatus('Your request has been submitted successfully.');
+      setButtonDisabled(true);
       setErrorMessage('');
+      if(response.requestStatus=='Rejected'){
+        setButtonDisabled(false);
+      }
     } catch (error) {
       console.error('Error requesting chatbot access:', error);
       setRequestStatus(null);
@@ -39,7 +45,8 @@ const RequestChatbot = () => {
 
       <button
         onClick={handleRequestChatbot}
-        className="bg-gradient-to-r from-blue-700 to-blue-900 transition-colors text-white font-semibold px-5 py-3 rounded-xl shadow-md"
+        disabled={buttondisabled}
+        className="bg-blue-600 hover:bg-blue-700 transition-colors text-white font-semibold px-5 py-3 rounded-xl shadow-md"
       >
          Request Access
       </button>

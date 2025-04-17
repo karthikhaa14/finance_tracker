@@ -13,7 +13,6 @@ const COLORS = ['#4F83CC', '#6B7280', '#10B981', '#F59E0B', '#EF4444']; // More 
 
 const Dashboard = () => {
   const { userId } = useOutletContext();
-  console.log(userId);
   const [incomeData, setIncomeData] = useState([]);
   const [expenseData, setExpenseData] = useState([]);
 

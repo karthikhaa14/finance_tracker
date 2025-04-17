@@ -15,10 +15,10 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Preloader from '../common/Preloader';
-import {jwtVerify} from 'jose'
+import {jwtDecode} from 'jwt-decode';
 
 
-let payloadData;
+let userId;
 const MainPagePeople = () => {
   const navigate=useNavigate();
   const [selectedComponent, setSelectedComponent] = useState('dashboard');
@@ -36,13 +36,11 @@ const MainPagePeople = () => {
     const fetchPermissions = async () => {
       try {
         const token= sessionStorage.getItem('token');
-        const secret = new TextEncoder().encode("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9");
-        const {payload} = await jwtVerify(token, secret)
-        payloadData = payload
-        if (!token) {
-          throw new Error('No authentication token found');
-        }
-        const response = await axios.get(`http://localhost:5000/api/permissions/${payload.userId}`, {
+        if (!token) throw new Error("No authentication token found");
+        const decoded = jwtDecode(token);  // No need for secret key
+        userId = decoded.userId;
+        
+        const response = await axios.get(`http://localhost:5000/api/permissions/${userId}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -146,7 +144,7 @@ const MainPagePeople = () => {
       {/* Main content */}
       <div className="flex-1 overflow-y-auto bg-[#f4f6f9] p-6 transition-all duration-300 ease-in-out">
         
-        <Outlet context={{ userId: payloadData?.userId }}/>
+        <Outlet context={{ userId: userId }}/>
       </div>
     </div>
   );
