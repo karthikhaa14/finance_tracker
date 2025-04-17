@@ -30,7 +30,7 @@ const UsersList = () => {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">User Management</h2>
+      <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">List of Users</h2>
 
       {users.length !== 0 ? (
         <div className="overflow-x-auto shadow-md rounded-lg bg-white">
@@ -52,7 +52,7 @@ const UsersList = () => {
                   <td className="px-6 py-4 text-center">
                     <button
                       onClick={() => handleDelete(user.id)}
-                      className="bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 rounded transition duration-200"
+                      className="bg-gradient-to-r from-red-500 to-red-700 text-white px-4 py-1.5 rounded transition duration-200"
                     >
                       Delete
                     </button>

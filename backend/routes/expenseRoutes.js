@@ -18,7 +18,7 @@ router.post('/:user_id', authMiddleware,createExpense);
 router.get('/:id',authMiddleware, getExpense);
 
 // Get all expenses for a specific user by user_id
-router.get('/user/:user_id',getExpensesByUser);
+router.get('/user/:user_id',authMiddleware,getExpensesByUser);
 
 // Update an expense by ID
 router.put('/:id',authMiddleware, updateExpense);

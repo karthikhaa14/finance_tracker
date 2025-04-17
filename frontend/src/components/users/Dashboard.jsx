@@ -7,18 +7,25 @@ import {
   Tooltip,
   ResponsiveContainer
 } from 'recharts';
+import { useOutletContext } from 'react-router-dom';
 
-const COLORS = ['#4F46E5', '#0EA5E9', '#10B981', '#F59E0B', '#EF4444']; // Professional, soft colors
+const COLORS = ['#4F83CC', '#6B7280', '#10B981', '#F59E0B', '#EF4444']; // More neutral, professional colors
 
-const Dashboard = ({ userId }) => {
+const Dashboard = () => {
+  const { userId } = useOutletContext();
+  console.log(userId);
   const [incomeData, setIncomeData] = useState([]);
   const [expenseData, setExpenseData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const incomeRes = await axios.get(`http://localhost:5000/api/incomes/user/${userId}`);
-        const expenseRes = await axios.get(`http://localhost:5000/api/expenses/user/${userId}`);
+        const incomeRes = await axios.get(`http://localhost:5000/api/incomes/user/${userId}`,{ headers: {
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+        },});
+        const expenseRes = await axios.get(`http://localhost:5000/api/expenses/user/${userId}`,{ headers: {
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+        },});
         setIncomeData(incomeRes.data);
         setExpenseData(expenseRes.data);
       } catch (err) {
@@ -53,22 +60,22 @@ const Dashboard = ({ userId }) => {
     .slice(0, 10);
 
   return (
-    <div className="p-6 space-y-8 bg-gray-100 min-h-screen">
+    <div className="p-6 space-y-8 bg-gray-50 min-h-screen">
 
       {/* Summary Card */}
-      <div className="bg-white p-6 rounded-2xl shadow-lg">
-        <h2 className="text-xl font-semibold mb-4 text-gray-700">Financial Summary</h2>
+      <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-200">
+        <h2 className="text-2xl font-semibold mb-6 text-gray-800 text-center">Financial Overview</h2>
         <div className="flex justify-around text-center">
-          <div className="bg-gray-100 py-10 px-4 rounded-xl w-1/4 mx-2 shadow-sm h-40 flex flex-col justify-center">
+          <div className="bg-gray-100 py-6 px-4 rounded-xl w-1/4 mx-2 shadow-sm h-40 flex flex-col justify-center">
             <h3 className="text-md font-medium text-gray-500">Total Income</h3>
-            <p className="text-2xl font-semibold text-green-600">{totalIncome.toFixed(2)}</p>
+            <p className="text-2xl font-semibold text-green-800">{totalIncome.toFixed(2)}</p>
           </div>
-          <div className="bg-gray-100 py-10 px-4 rounded-xl w-1/4 mx-2 shadow-sm h-40 flex flex-col justify-center">
+          <div className="bg-gray-100 py-6 px-4 rounded-xl w-1/4 mx-2 shadow-sm h-40 flex flex-col justify-center">
             <h3 className="text-md font-medium text-gray-500">Total Expenses</h3>
             <p className="text-2xl font-semibold text-red-600">{totalExpense.toFixed(2)}</p>
           </div>
-          <div className="bg-gray-100 py-10 px-4 rounded-xl w-1/4 mx-2 shadow-sm h-40 flex flex-col justify-center">
-            <h3 className="text-md font-medium text-gray-500">Remaining</h3>
+          <div className="bg-gray-100 py-6 px-4 rounded-xl w-1/4 mx-2 shadow-sm h-40 flex flex-col justify-center">
+            <h3 className="text-md font-medium text-gray-500">Remaining Balance</h3>
             <p className="text-2xl font-semibold text-blue-600">{remaining.toFixed(2)}</p>
           </div>
         </div>
@@ -76,7 +83,7 @@ const Dashboard = ({ userId }) => {
       
       {/* Charts Card */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-2xl shadow-lg">
+        <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
           <h3 className="text-lg font-semibold mb-4 text-gray-700 text-center">Income by Source</h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
@@ -90,7 +97,7 @@ const Dashboard = ({ userId }) => {
           </ResponsiveContainer>
         </div>
 
-        <div className="bg-white p-6 rounded-2xl shadow-lg">
+        <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
           <h3 className="text-lg font-semibold mb-4 text-gray-700 text-center">Expense by Category</h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
@@ -106,31 +113,34 @@ const Dashboard = ({ userId }) => {
       </div>
 
       {/* Latest Transactions Card */}
-      <div className="bg-white p-6 rounded-2xl shadow-lg">
+      <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
         <h3 className="text-xl font-semibold mb-4 text-gray-700 text-center">Recent Transactions</h3>
-        {latestEntries.length!=0?(
-        <div className="overflow-x-auto">
-          <table className="min-w-full table-auto border border-gray-200 text-sm">
-            <thead>
-              <tr className="bg-gray-50 text-gray-600">
-                <th className="py-2 px-4 border">Type</th>
-                <th className="py-2 px-4 border">Category/Source</th>
-                <th className="py-2 px-4 border">Amount</th>
-                <th className="py-2 px-4 border">Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {latestEntries.map((entry, index) => (
-                <tr key={index} className="text-center hover:bg-gray-50">
-                  <td className="py-2 px-4 border">{'source' in entry ? 'Income' : 'Expense'}</td>
-                  <td className="py-2 px-4 border">{'source' in entry ? entry.source : entry.category}</td>
-                  <td className="py-2 px-4 border text-gray-700">${parseFloat(entry.amount).toFixed(2)}</td>
-                  <td className="py-2 px-4 border text-gray-500">{new Date(entry.date).toLocaleDateString()}</td>
+        {latestEntries.length !== 0 ? (
+          <div className="overflow-x-auto">
+            <table className="min-w-full table-auto border-collapse border border-gray-200 text-sm">
+              <thead className="bg-gray-50">
+                <tr className="text-gray-600">
+                  <th className="py-2 px-4 border">Type</th>
+                  <th className="py-2 px-4 border">Category/Source</th>
+                  <th className="py-2 px-4 border">Amount</th>
+                  <th className="py-2 px-4 border">Date</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>):(<p className="text-center text-gray-500 text-lg"> No entries</p>)}
+              </thead>
+              <tbody>
+                {latestEntries.map((entry, index) => (
+                  <tr key={index} className="text-center hover:bg-gray-50">
+                    <td className="py-2 px-4 border">{'source' in entry ? 'Income' : 'Expense'}</td>
+                    <td className="py-2 px-4 border">{'source' in entry ? entry.source : entry.category}</td>
+                    <td className="py-2 px-4 border text-gray-700">${parseFloat(entry.amount).toFixed(2)}</td>
+                    <td className="py-2 px-4 border text-gray-500">{new Date(entry.date).toLocaleDateString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="text-center text-gray-500 text-lg">No entries yet</p>
+        )}
       </div>
 
     </div>

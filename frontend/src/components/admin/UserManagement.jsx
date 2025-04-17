@@ -96,56 +96,98 @@ const UserManagement = () => {
   // };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg mt-10">
-      <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">User Management</h2>
+    <div className="max-w-3xl mx-auto p-8 bg-white shadow-xl rounded-lg mt-10 border border-gray-200">
+  <h2 className="text-3xl font-semibold text-gray-800 text-center mb-8">User Management</h2>
 
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <input type="text" name="username" placeholder="Username" value={form.username} onChange={handleChange} className="p-2 border rounded" required />
-        <input type="email" name="email" placeholder="Email" value={form.email} onChange={handleChange} className="p-2 border rounded" required />
-        <input type="password" name="password" placeholder="Password" value={form.password} onChange={handleChange} className="p-2 border rounded" required/>
-        <select name="role" value={form.role} onChange={handleChange} className="p-2 border rounded">
-          <option value="user1">User1</option>
-          <option value="user2">User2</option>
-        </select>
-
-        <div className="md:col-span-2 grid grid-cols-2 gap-2">
-          {Object.keys(form.permissions).map((key) => (
-            <label key={key} className="flex items-center space-x-2">
-              <input type="checkbox" name={key} checked={form.permissions[key]} onChange={handleChange} />
-              <span className="capitalize">{key.replace('_', ' ')}</span>
-            </label>
-          ))}
-        </div>
-
-        <button type="submit" className="md:col-span-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">
-          create user
-        </button>
-      </form>
-
-      {/* <table className="min-w-full border text-sm text-left text-gray-800">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="px-4 py-2 border">Username</th>
-            <th className="px-4 py-2 border">Email</th>
-            <th className="px-4 py-2 border">Role</th>
-            <th className="px-4 py-2 border text-center">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map(user => (
-            <tr key={user.id} className="hover:bg-gray-50">
-              <td className="px-4 py-2 border">{user.username}</td>
-              <td className="px-4 py-2 border">{user.email}</td>
-              <td className="px-4 py-2 border capitalize">{user.role}</td>
-              <td className="px-4 py-2 border text-center space-x-2">
-                <button onClick={() => handleEdit(user)} className="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded">Edit</button>
-                <button onClick={() => handleDelete(user.id)} className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">Delete</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table> */}
+  <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    {/* Username Input */}
+    <div>
+      <label htmlFor="username" className="block text-gray-700 font-medium mb-2">Username</label>
+      <input
+        type="text"
+        name="username"
+        id="username"
+        placeholder="Enter username"
+        value={form.username}
+        onChange={handleChange}
+        className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+        required
+      />
     </div>
+
+    {/* Email Input */}
+    <div>
+      <label htmlFor="email" className="block text-gray-700 font-medium mb-2">Email</label>
+      <input
+        type="email"
+        name="email"
+        id="email"
+        placeholder="Enter email"
+        value={form.email}
+        onChange={handleChange}
+        className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+        required
+      />
+    </div>
+
+    {/* Password Input */}
+    <div>
+      <label htmlFor="password" className="block text-gray-700 font-medium mb-2">Password</label>
+      <input
+        type="password"
+        name="password"
+        id="password"
+        placeholder="Enter password"
+        value={form.password}
+        onChange={handleChange}
+        className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+        required
+      />
+    </div>
+
+    {/* Role Select */}
+    <div>
+      <label htmlFor="role" className="block text-gray-700 font-medium mb-2">Role</label>
+      <select
+        name="role"
+        id="role"
+        value={form.role}
+        onChange={handleChange}
+        className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+      >
+        <option value="user1">User1</option>
+        <option value="user2">User2</option>
+      </select>
+    </div>
+
+    {/* Permissions */}
+    <div className="md:col-span-2 grid grid-cols-2 gap-4">
+      {Object.keys(form.permissions).map((key) => (
+        <label key={key} className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            name={key}
+            checked={form.permissions[key]}
+            onChange={handleChange}
+            className="form-checkbox text-blue-500"
+          />
+          <span className="capitalize text-gray-700">{key.replace('_', ' ')}</span>
+        </label>
+      ))}
+    </div>
+
+    {/* Submit Button */}
+    <div className="md:col-span-2">
+      <button
+        type="submit"
+        className="w-full py-3 bg-gradient-to-r from-blue-700 to-blue-900 text-white text-lg font-medium rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        Create User
+      </button>
+    </div>
+  </form>
+</div>
+
   );
 };
 

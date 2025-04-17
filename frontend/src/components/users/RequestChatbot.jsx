@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { CheckCircle, AlertCircle } from 'lucide-react';
+import { useOutletContext } from 'react-router-dom';
 
-const RequestChatbot = ({ userId }) => {
+const RequestChatbot = () => {
+  const context= useOutletContext();
+    const userId=context.userId;
   const [requestStatus, setRequestStatus] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -10,7 +13,9 @@ const RequestChatbot = ({ userId }) => {
     try {
       const response = await axios.post(`http://localhost:5000/api/requests/${userId}`, {
         user_id: userId,
-        request_type: 'chatbot_access',
+        request_type: 'chatbot_access', headers: {
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+        },
       });
       setRequestStatus('Your request has been submitted successfully.');
       setErrorMessage('');
@@ -34,7 +39,7 @@ const RequestChatbot = ({ userId }) => {
 
       <button
         onClick={handleRequestChatbot}
-        className="bg-blue-600 hover:bg-blue-700 transition-colors text-white font-semibold px-5 py-3 rounded-xl shadow-md"
+        className="bg-gradient-to-r from-blue-700 to-blue-900 transition-colors text-white font-semibold px-5 py-3 rounded-xl shadow-md"
       >
          Request Access
       </button>

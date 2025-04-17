@@ -1,8 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { utils, writeFile } from 'xlsx';
+import { useOutletContext } from 'react-router-dom';
 
-const Income = ({ userId }) => {
+// Lucide Icons
+import {
+  PlusCircle,
+  Eye,
+  Download,
+  Pencil,
+  Trash2,
+  ArrowLeft
+} from 'lucide-react';
+
+const Income = () => {
+  const context = useOutletContext();
+  const userId = context.userId;
+
   const [showForm, setShowForm] = useState(false);
   const [incomes, setIncomes] = useState([]);
   const [formData, setFormData] = useState({ amount: '', source: '', date: '' });
@@ -16,11 +30,29 @@ const Income = ({ userId }) => {
   const handleSave = async () => {
     if (formData.amount && formData.source && formData.date) {
       try {
-        const response = await axios.post(`http://localhost:5000/api/incomes/${userId}`, formData);
-        setIncomes((prev) => [...prev, response.data]);
-        setFormData({ amount: '', source: '', date: '' });
-        setShowForm(false);
-      } catch (error) {
+        let response;
+        if(formData.id){
+          const response = await axios.put(`http://localhost:5000/api/incomes/${userId}`, formData,{
+            headers: {
+              Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+            },
+          });
+          
+        }
+        else{
+        const response = await axios.post(`http://localhost:5000/api/incomes/${userId}`, formData,{
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+          },
+        });
+        const updatedIncome=response.data;
+        if(formData.id){
+          setIncomes(prev=>prev.map(income=>income.id===updatedIncome.id?updatedIncome:income));
+       }
+       else{
+        setIncomes(prev=>[...prev,updatedIncome]);
+       }
+      } }catch (error) {
         console.error('Error saving income data:', error);
       }
     }
@@ -87,30 +119,35 @@ const Income = ({ userId }) => {
     writeFile(workbook, 'IncomeData.xlsx');
   };
 
+  const gradientButtonClass = "flex items-center gap-2 bg-gradient-to-r from-blue-700 to-blue-900 text-white px-4 py-2 rounded shadow-md hover:opacity-90 transition";
+
   return (
     <div className="p-6 relative">
-      {/* Top Right Buttons */}
+      {/* Top Buttons */}
       <div className="flex justify-end gap-3 mb-4">
         <button
           onClick={() => {
             setShowForm(true);
             setShowIncomeList(false);
           }}
-          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+          className={gradientButtonClass}
         >
+          <PlusCircle size={18} />
           Add Income
         </button>
         <button
           onClick={viewIncome}
-          className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded"
+          className={gradientButtonClass}
         >
+          <Eye size={18} />
           View Income
         </button>
       </div>
 
-      {/* Form Section */}
+      {/* Income Form */}
       {showForm && !showIncomeList && (
-        <div className="mt-6 space-y-4 max-w-md">
+        <div className="max-w-md mx-auto bg-white mt-10 shadow-lg rounded-lg p-6 space-y-4">
+          <h2 className="text-xl font-bold mb-2 text-center">Add Income</h2>
           <input
             type="number"
             name="amount"
@@ -134,11 +171,12 @@ const Income = ({ userId }) => {
             onChange={handleInputChange}
             className="w-full p-2 border border-gray-300 rounded"
           />
-          <div className="flex gap-4">
+          <div className="flex gap-4 justify-center mt-4">
             <button
               onClick={handleSave}
-              className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
+              className={gradientButtonClass}
             >
+              <PlusCircle size={18} />
               Save Income
             </button>
             <button
@@ -151,16 +189,17 @@ const Income = ({ userId }) => {
         </div>
       )}
 
-      {/* Income Table Section */}
+      {/* Income List Table */}
       {showIncomeList && (
         <div className="mt-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-bold">Income Records</h2>
             <button
               onClick={handleBack}
-              className="text-sm text-blue-600 hover:underline"
+              className="flex items-center text-sm text-blue-600 hover:underline"
             >
-              ← Back
+              <ArrowLeft size={16} />
+              Back
             </button>
           </div>
 
@@ -169,33 +208,35 @@ const Income = ({ userId }) => {
           ) : (
             <>
               <div className="overflow-x-auto">
-                <table className="min-w-full bg-white border border-gray-200 shadow-md rounded">
+                <table className="min-w-full bg-white border border-gray-200 rounded-lg">
                   <thead className="bg-gray-100 text-gray-700">
-                    <tr>
-                      <th className="py-2 px-4 border-b">Amount</th>
-                      <th className="py-2 px-4 border-b">Source</th>
-                      <th className="py-2 px-4 border-b">Date</th>
-                      <th className="py-2 px-4 border-b">Actions</th>
+                    <tr className="text-left text-sm">
+                      <th className="px-4 py-2 border-b">Amount</th>
+                      <th className="px-4 py-2 border-b">Source</th>
+                      <th className="px-4 py-2 border-b">Date</th>
+                      <th className="px-4 py-2 border-b">Actions</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    {incomes.map((income) => (
-                      <tr key={income.id} className="text-center">
-                        <td className="py-2 px-4 border-b">${income.amount}</td>
-                        <td className="py-2 px-4 border-b">{income.source}</td>
-                        <td className="py-2 px-4 border-b">{income.date}</td>
-                        <td className="py-2 px-4 border-b space-x-2">
+                  <tbody className="text-sm">
+                    {incomes.map((income, index) => (
+                      <tr key={income.id} className={`border-b ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
+                        <td className="px-4 py-2">₹{income.amount}</td>
+                        <td className="px-4 py-2">{income.source}</td>
+                        <td className="px-4 py-2">{income.date.split('T')[0]}</td>
+                        <td className="px-4 py-2 flex gap-3">
                           <button
                             onClick={() => handleEdit(income.id)}
-                            className="text-blue-500 hover:underline"
+                            className="text-blue-600 hover:text-blue-800"
+                            title="Edit"
                           >
-                            Edit
+                            <Pencil size={18} />
                           </button>
                           <button
                             onClick={() => handleDelete(income.id)}
-                            className="text-red-500 hover:underline"
+                            className="text-red-500 hover:text-red-700"
+                            title="Delete"
                           >
-                            Delete
+                            <Trash2 size={18} />
                           </button>
                         </td>
                       </tr>
@@ -203,11 +244,13 @@ const Income = ({ userId }) => {
                   </tbody>
                 </table>
               </div>
-              <div className="mt-4 flex justify-end">
+
+              <div className="mt-6 flex justify-end">
                 <button
                   onClick={downloadCSV}
-                  className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded"
+                  className={gradientButtonClass}
                 >
+                  <Download size={18} />
                   Download Income
                 </button>
               </div>

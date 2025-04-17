@@ -1,8 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { utils, writeFile } from 'xlsx';
+import { useOutletContext } from 'react-router-dom';
 
-const Expense = ({ userId }) => {
+// Lucide Icons
+import {
+  PlusCircle,
+  Eye,
+  Download,
+  Pencil,
+  Trash2,
+  ArrowLeft
+} from 'lucide-react';
+
+const Expense = () => {
+  const context = useOutletContext();
+  const userId = context.userId;
+
   const [showForm, setShowForm] = useState(false);
   const [expenses, setExpenses] = useState([]);
   const [formData, setFormData] = useState({ amount: '', category: '', date: '' });
@@ -13,21 +27,34 @@ const Expense = ({ userId }) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  
+  
   const handleSave = async () => {
     if (formData.amount && formData.category && formData.date) {
       try {
-        const token= sessionStorage.getItem('token');
-        const response = await axios.post(`http://localhost:5000/api/expenses/${userId}`, formData,
-          {
+        let response;
+        if(formData.id){
+          const response = await axios.put(`http://localhost:5000/api/expenses/${userId}`, formData,{
             headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
-        );
-        setExpenses((prev) => [...prev, response.data]);
-        setFormData({ amount: '', category: '', date: '' });
-        setShowForm(false);
-      } catch (error) {
+              Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+            },
+          });
+          
+        }
+        else{
+        const response = await axios.post(`http://localhost:5000/api/expenses/${userId}`, formData,{
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+          },
+        });
+        const updatedExpense=response.data;
+        if(formData.id){
+          setExpenses(prev=>prev.map(expense=>expense.id===updatedExpense.id?updatedExpense:expense));
+       }
+       else{
+        setExpenses(prev=>[...prev,updatedExpense]);
+       }
+      } }catch (error) {
         console.error('Error saving expense data:', error);
       }
     }
@@ -40,8 +67,9 @@ const Expense = ({ userId }) => {
           Authorization: `Bearer ${sessionStorage.getItem('token')}`,
         },
       });
+
       if (response.status === 204) {
-        setExpenses((prev) => prev.filter((exp) => exp.id !== id));
+        setExpenses((prev) => prev.filter((expense) => expense.id !== id));
       }
     } catch (error) {
       console.error('Error deleting expense:', error);
@@ -55,8 +83,10 @@ const Expense = ({ userId }) => {
           Authorization: `Bearer ${sessionStorage.getItem('token')}`,
         },
       });
-      setFormData(response.data);
-      setExpenses((prev) => prev.filter((exp) => exp.id !== id));
+
+      const expenseToEdit = response.data;
+      setFormData(expenseToEdit);
+      setExpenses((prev) => prev.filter((expense) => expense.id !== id));
       setShowForm(true);
       setShowExpenseList(false);
     } catch (error) {
@@ -91,39 +121,35 @@ const Expense = ({ userId }) => {
     writeFile(workbook, 'ExpenseData.xlsx');
   };
 
+  const gradientButtonClass = "flex items-center gap-2 bg-gradient-to-r from-blue-700 to-blue-900 text-white px-4 py-2 rounded shadow-md hover:opacity-90 transition";
+
   return (
     <div className="p-6 relative">
-      {/* Top Right Buttons */}
+      {/* Top Buttons */}
       <div className="flex justify-end gap-3 mb-4">
         <button
           onClick={() => {
             setShowForm(true);
             setShowExpenseList(false);
           }}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+          className={gradientButtonClass}
         >
+          <PlusCircle size={18} />
           Add Expense
         </button>
         <button
           onClick={viewExpense}
-          className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
+          className={gradientButtonClass}
         >
+          <Eye size={18} />
           View Expense
         </button>
-        {showExpenseList && (
-  <button
-    onClick={downloadCSV}
-    className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded"
-  >
-    Download Expense
-  </button>
-)}
-
       </div>
 
       {/* Expense Form */}
       {showForm && !showExpenseList && (
-        <div className="mt-6 space-y-4 max-w-md">
+        <div className="max-w-md mx-auto bg-white mt-10 shadow-lg rounded-lg p-6 space-y-4">
+          <h2 className="text-xl font-bold mb-2 text-center">Add Expense</h2>
           <input
             type="number"
             name="amount"
@@ -147,11 +173,12 @@ const Expense = ({ userId }) => {
             onChange={handleInputChange}
             className="w-full p-2 border border-gray-300 rounded"
           />
-          <div className="flex gap-4">
+          <div className="flex gap-4 justify-center mt-4">
             <button
               onClick={handleSave}
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+              className={gradientButtonClass}
             >
+              <PlusCircle size={18} />
               Save Expense
             </button>
             <button
@@ -171,42 +198,46 @@ const Expense = ({ userId }) => {
             <h2 className="text-xl font-bold">Expense Records</h2>
             <button
               onClick={handleBack}
-              className="text-sm text-blue-600 hover:underline"
+              className="flex items-center text-sm text-blue-600 hover:underline"
             >
+              <ArrowLeft size={16} />
               Back
             </button>
           </div>
+
           {expenses.length === 0 ? (
             <p className="text-gray-500">No expense records found.</p>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full border border-gray-300 text-sm">
-                <thead>
-                  <tr className="bg-gray-100">
-                    <th className="border px-4 py-2">Amount</th>
-                    <th className="border px-4 py-2">Category</th>
-                    <th className="border px-4 py-2">Date</th>
-                    <th className="border px-4 py-2">Actions</th>
+              <table className="min-w-full bg-white border border-gray-200 rounded-lg">
+                <thead className="bg-gray-100 text-gray-700">
+                  <tr className="text-left text-sm">
+                    <th className="px-6 py-3 border-b">Amount</th>
+                    <th className="px-6 py-3 border-b">Category</th>
+                    <th className="px-6 py-3 border-b">Date</th>
+                    <th className="px-6 py-3 border-b">Actions</th>
                   </tr>
                 </thead>
-                <tbody>
-                  {expenses.map((exp) => (
-                    <tr key={exp.id} className="text-center">
-                      <td className="border px-4 py-2">${exp.amount}</td>
-                      <td className="border px-4 py-2">{exp.category}</td>
-                      <td className="border px-4 py-2">{exp.date}</td>
-                      <td className="border px-4 py-2 space-x-2">
+                <tbody className="text-sm">
+                  {expenses.map((expense, index) => (
+                    <tr key={expense.id} className={`border-b ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
+                      <td className="px-6 py-3">₹{expense.amount}</td>
+                      <td className="px-6 py-3">{expense.category}</td>
+                      <td className="px-6 py-3">{expense.date.split('T')[0]}</td>
+                      <td className="px-6 py-3 flex gap-4">
                         <button
-                          onClick={() => handleEdit(exp.id)}
-                          className="text-blue-600 hover:underline"
+                          onClick={() => handleEdit(expense.id)}
+                          className="text-blue-600 hover:text-blue-800"
+                          title="Edit"
                         >
-                          Edit
+                          <Pencil size={18} />
                         </button>
                         <button
-                          onClick={() => handleDelete(exp.id)}
-                          className="text-red-600 hover:underline"
+                          onClick={() => handleDelete(expense.id)}
+                          className="text-red-500 hover:text-red-700"
+                          title="Delete"
                         >
-                          Delete
+                          <Trash2 size={18} />
                         </button>
                       </td>
                     </tr>
@@ -216,6 +247,19 @@ const Expense = ({ userId }) => {
             </div>
           )}
         </div>
+      )}
+
+      {/* Download Button */}
+      {showExpenseList && (
+        <div className="mt-6 flex justify-end">
+                        <button
+                          onClick={downloadCSV}
+                          className={gradientButtonClass}
+                        >
+                          <Download size={18} />
+                          Download Expense
+                        </button>
+                      </div>
       )}
     </div>
   );

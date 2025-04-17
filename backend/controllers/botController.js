@@ -15,22 +15,23 @@ const askGemini = async (req, res) => {
       
       // Convert data to readable string format
       const dataString = JSON.stringify(data, null, 2);
-      const prompt = `Analyze this expense data and answer the query:
-      
-      EXPENSE DATA:
+      const prompt = `
+      I'll be giving some questions and you should answer to it
+      and your answer should be related to the query i'm giving 
+
+      data:
       ${dataString}
       
       QUERY: ${query}
       
-      Provide your response in a proper format`;
+      Provide your response in a proper format that it should contain only user response`;
   
       const result = await model.generateContent(prompt);
       const response = await result.response;
       
       // Get full text content
       const text = response.text();
-    //   console.log("Full Gemini Response:", text);
-     
+  
       return res.status(200).json({ answer: text });
     } catch (error) {
       console.error("Gemini API error:", error);

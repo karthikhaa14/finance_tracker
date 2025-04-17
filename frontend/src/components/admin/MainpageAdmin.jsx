@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { Outlet,Link, useNavigate } from 'react-router-dom';
 import {
   BookOpen,
   Users,
@@ -12,12 +13,13 @@ import {
   Menu
 } from 'lucide-react';
 
-import UserManagement from './UserManagement'
-import Requestscomponent from './Requestscomponent'
-import UsersList from './UsersList';
+// import UserManagement from './UserManagement'
+// import Requestscomponent from './Requestscomponent'
+// import UsersList from './UsersList';
 import Preloader from '../common/Preloader';
 
-const MainpageAdmin = ({ onLogout }) => {
+const MainpageAdmin = () => {
+  const Navigate =useNavigate();
     const [selectedComponent, setSelectedComponent] = useState('user management');
     const [isLoading, setIsLoading] = useState(true);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -27,18 +29,13 @@ const MainpageAdmin = ({ onLogout }) => {
         setIsLoading(false);
       }, 5000);
       return () => clearTimeout(timer);
+      Navigate('/admin/user_management');
     }, []);
   
     if (isLoading) return <Preloader />;
-  
-    const renderComponent = () => {
-      switch (selectedComponent) {
-        case 'user management': return <UserManagement/>;
-        case 'users list': return <UsersList/>;
-        case 'request':return <Requestscomponent />
-        default: return <Dashboard />;
-      }
-    };
+    const handleLogout=()=>{
+      Navigate('/');
+    }
   
     return (
       <div className="flex h-screen w-full overflow-hidden">
@@ -60,35 +57,37 @@ const MainpageAdmin = ({ onLogout }) => {
           </motion.div>
   
           <div className="flex-1 px-2 py-4 space-y-1">
-            
+            <Link to='/admin/user_management'>
             <SidebarItem
               icon={<Users size={20} />}
               text="User Management"
               active={selectedComponent === 'user management'}
               onClick={() => setSelectedComponent('user management')}
               isOpen={isSidebarOpen}
-            />
+            /></Link>
+            <Link to='/admin/users_list'>
             <SidebarItem
               icon={<Users size={20} />}
               text="Users"
               active={selectedComponent === 'users list'}
               onClick={() => setSelectedComponent('users list')}
               isOpen={isSidebarOpen}
-            />
+            /></Link>
+            <Link to='/admin/requests'>
             <SidebarItem
               icon={<Shield size={20} />}
               text="Requests"
               active={selectedComponent === 'request'}
               onClick={() => setSelectedComponent('request')}
               isOpen={isSidebarOpen}
-            />
+            /></Link>
           </div>
   
           <div className="px-2 pb-4">
             <SidebarItem
               icon={<LogOut size={20} />}
               text="Logout"
-              onClick={onLogout}
+              onClick={handleLogout}
               isOpen={isSidebarOpen}
             />
           </div>
@@ -96,7 +95,7 @@ const MainpageAdmin = ({ onLogout }) => {
   
         {/* Main content */}
         <div className="flex-1 overflow-y-auto bg-[#f4f6f9] p-6 transition-all duration-300 ease-in-out">
-          {renderComponent()}
+         <Outlet />
         </div>
       </div>
     );
@@ -106,7 +105,7 @@ const MainpageAdmin = ({ onLogout }) => {
     <div
       onClick={onClick}
       className={`flex items-center gap-2 cursor-pointer rounded px-3 py-2 transition-all duration-200 
-        ${active ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white'}
+        ${active ? 'bg-gradient-to-r from-blue-700 to-blue-900 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white'}
       `}
     >
       {React.cloneElement(icon, {

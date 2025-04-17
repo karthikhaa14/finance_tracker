@@ -43,20 +43,20 @@ const updatePermissions = async (req, res) => {
 };
 
 // Delete Permissions (for chatbot access)
-const deletePermissions = async (req, res) => {
-  const { user_id } = req.params;
-  try {
-    const result = await pool.query('DELETE FROM permissions WHERE user_id = $1 RETURNING *', [user_id]);
-    if (result.rows.length === 0) return res.status(404).json({ error: 'Permissions not found' });
-    res.status(204).json({ message: 'Permissions deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ error: 'Error deleting permissions' });
-  }
-};
+// const deletePermissions = async (req, res) => {
+//   const { user_id } = req.params;
+//   try {
+//     const result = await pool.query('DELETE FROM permissions WHERE user_id = $1 RETURNING *', [user_id]);
+//     if (result.rows.length === 0) return res.status(404).json({ error: 'Permissions not found' });
+//     res.status(204).json({ message: 'Permissions deleted successfully' });
+//   } catch (error) {
+//     res.status(500).json({ error: 'Error deleting permissions' });
+//   }
+// };
 
 module.exports = {
   createPermissions,
   getPermissions,
   updatePermissions,
-  deletePermissions,
+  //deletePermissions,
 };

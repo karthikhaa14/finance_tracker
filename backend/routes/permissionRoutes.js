@@ -4,19 +4,19 @@ const {
   createPermissions,
   getPermissions,
   updatePermissions,
-  deletePermissions,
+ // deletePermissions,
 } = require('../controllers/permissionController');
 const authMiddleware=require('../middleware/authMiddleware')
 // Create Permissions (for chatbot access)
 router.post('/', createPermissions);
 
-// Get Permissions by User ID
+
 router.get('/:user_id',authMiddleware,getPermissions);
 
-// Update Permissions (for chatbot access)
+
 router.put('/:user_id',updatePermissions);
 
-// Delete Permissions (for chatbot access)
-router.delete('/:user_id',authMiddleware, deletePermissions);
+
+//router.delete('/:user_id',authMiddleware, deletePermissions);
 
 module.exports = router;

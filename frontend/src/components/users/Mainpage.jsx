@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
+import {Outlet,Link} from 'react-router-dom';
 import {
   BookOpen,
   Users,
@@ -12,17 +13,14 @@ import {
   X,
   Menu
 } from 'lucide-react';
-import Dashboard from './Dashboard'
-import Income from './Income'
-import Expense from './Expense'
-import Chatbot from './Chatbot'
+import { useNavigate } from 'react-router-dom';
 import Preloader from '../common/Preloader';
-import RequestChatbot from './RequestChatbot';
 import {jwtVerify} from 'jose'
 
 
 let payloadData;
-const MainPagePeople = ({ onLogout }) => {
+const MainPagePeople = () => {
+  const navigate=useNavigate();
   const [selectedComponent, setSelectedComponent] = useState('dashboard');
   const [isLoading, setIsLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -55,6 +53,7 @@ const MainPagePeople = ({ onLogout }) => {
           exp: response.data.expense_access,
           chat: response.data.chatbot_access
         });
+        navigate('/user/dashboard');
       } catch (error) {
         console.error('Error fetching permissions:', error);
       } finally {
@@ -66,16 +65,10 @@ const MainPagePeople = ({ onLogout }) => {
 
   if (isLoading) return <Preloader />;
 
-  const renderComponent = () => {
-    if (!payloadData) return null;
-    switch (selectedComponent) {
-      case 'dashboard': return <Dashboard userId={payloadData.userId}/>;
-      case 'income': return <Income userId={payloadData.userId} />;
-      case 'expense': return <Expense userId={payloadData.userId}/>;
-      case 'chatbot': return <Chatbot />;
-      case 'request': return <RequestChatbot userId={payloadData.userId} />;
-      default: return <Dashboard userId={payloadData.userId} />;
-    }
+  const handleLogout = () => {
+    sessionStorage.removeItem('token'); // Clear the session token
+    //onLogout(); // Call the onLogout function passed from the parent
+    navigate('/');  // Redirect to the login page
   };
 
   return (
@@ -98,48 +91,53 @@ const MainPagePeople = ({ onLogout }) => {
         </motion.div>
 
         <div className="flex-1 px-2 py-4 space-y-1">
+          <Link to='/user/dashboard'>
           {permissions.dash && <SidebarItem
             icon={<BookOpen size={20} />}
             text="Dashboard"
             active={selectedComponent === 'dashboard'}
             onClick={() => setSelectedComponent('dashboard')}
             isOpen={isSidebarOpen}
-          />}
+          />}</Link>
+           <Link to='/user/income'>
           {permissions.inc&& <SidebarItem
             icon={<Users size={20} />}
             text="Income"
             active={selectedComponent === 'income'}
             onClick={() => setSelectedComponent('income')}
             isOpen={isSidebarOpen}
-          />}
+          />}</Link>
+          <Link to ='/user/expense'>
           {permissions.exp&&<SidebarItem
             icon={<Shield size={20} />}
             text="Expense"
             active={selectedComponent === 'expense'}
             onClick={() => setSelectedComponent('expense')}
             isOpen={isSidebarOpen}
-          />}
+          />}</Link>
+          <Link to ='/user/chatbot'>
           {permissions.chat&&<SidebarItem
             icon={<MessageCircleQuestion size={20} />}
             text="Chatbot"
             active={selectedComponent === 'chatbot'}
             onClick={() => setSelectedComponent('chatbot')}
             isOpen={isSidebarOpen}
-          />}
+          />}</Link>
+          <Link to ='/user/chatrequest'>
           {!permissions.chat &&<SidebarItem
             icon={<MessageCircleQuestion size={20} />}
             text="Request for Chatbot"
             active={selectedComponent === 'request'}
             onClick={() => setSelectedComponent('request')}
             isOpen={isSidebarOpen}
-          />}
+          />}</Link>
         </div>
 
         <div className="px-2 pb-4">
           <SidebarItem
             icon={<LogOut size={20} />}
             text="Logout"
-            onClick={onLogout}
+            onClick={handleLogout}
             isOpen={isSidebarOpen}
           />
         </div>
@@ -147,7 +145,8 @@ const MainPagePeople = ({ onLogout }) => {
 
       {/* Main content */}
       <div className="flex-1 overflow-y-auto bg-[#f4f6f9] p-6 transition-all duration-300 ease-in-out">
-        {renderComponent()}
+        
+        <Outlet context={{ userId: payloadData?.userId }}/>
       </div>
     </div>
   );
@@ -157,7 +156,7 @@ const SidebarItem = ({ icon, text, active, onClick, isOpen }) => (
   <div
     onClick={onClick}
     className={`flex items-center gap-2 cursor-pointer rounded px-3 py-2 transition-all duration-200 
-      ${active ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white'}
+      ${active ? 'bg-gradient-to-r from-blue-700 to-blue-900 text-white' : 'text-gray-400 hover:bg-gray-700 hover:text-white'}
     `}
   >
     {React.cloneElement(icon, {
