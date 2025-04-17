@@ -9,7 +9,7 @@ import {jwtDecode} from 'jwt-decode';
 const Login = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [login, setLogin] = useState(false);
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -24,7 +24,7 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/login", { username, password });
+      const response = await axios.post("http://localhost:5000/api/auth/login", { email, password });
       const token = response.data.token;
       if (!token) {
         setError('Invalid Credentials');
@@ -95,13 +95,13 @@ const Login = () => {
             <div>
               <label className="block mb-1 text-white font-semibold">
                 <User size={18} className="inline mr-2" />
-                Username
+                Email
               </label>
               <input
                 type="text"
                 className="w-full px-3 py-2 rounded bg-white/20 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-blue-300"
-                value={username}
-                onChange={e => setUsername(e.target.value)}
+                value={email}
+                onChange={e => setEmail(e.target.value)}
                 required
               />
             </div>

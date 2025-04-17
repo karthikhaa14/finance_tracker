@@ -6,14 +6,14 @@ const loginUser = async (req, res) => {
    
       
     try {    
-        const { username, password } = req.body;
+        const { email, password } = req.body;
         const userQuery = await pool.query(
-            'SELECT * FROM users WHERE username = $1', 
-            [username]
+            'SELECT * FROM users WHERE email = $1', 
+            [email]
         );
         const user = userQuery.rows[0];
 
-        if (username === process.env.ADMIN_UNAME && password === process.env.ADMIN_PWD) {
+        if (email=== process.env.ADMIN_UNAME && password === process.env.ADMIN_PWD) {
             const token = jwt.sign({  role: "admin" },process.env.JWT_SECRET_KEY , { expiresIn: "1h" });
             res.json({ token });
           }

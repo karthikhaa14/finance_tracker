@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { utils, writeFile } from 'xlsx';
 import { useOutletContext } from 'react-router-dom';
@@ -26,20 +26,35 @@ const Expense = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+  useEffect(() => {
+    const fetchExpenses = async () => {     
+      try { 
+        const response = await axios.get(`http://localhost:5000/api/expenses/user/${userId}`, {
+          headers: {  
+            Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+          },  
+        });
+        setExpenses(response.data);
+        setShowExpenseList(true);
+      } catch (error) {
+        console.error('Error fetching expenses:', error); 
+      } 
+    };
+    fetchExpenses();
+  }, [userId]);
 
-  
-  
   const handleSave = async () => {
     if (formData.amount && formData.category && formData.date) {
       try {
         let response;
         if(formData.id){
-          const response = await axios.put(`http://localhost:5000/api/expenses/${userId}`, formData,{
+          const response = await axios.put(`http://localhost:5000/api/expenses/${formData.id}`, formData,{
             headers: {
               Authorization: `Bearer ${sessionStorage.getItem('token')}`,
             },
           });
-          
+          const updatedExpense=response.data;
+          setExpenses(prev=>prev.map(expense=>expense.id===updatedExpense.id?updatedExpense:expense));
         }
         else{
         const response = await axios.post(`http://localhost:5000/api/expenses/${userId}`, formData,{
@@ -47,14 +62,12 @@ const Expense = () => {
             Authorization: `Bearer ${sessionStorage.getItem('token')}`,
           },
         });
-        const updatedExpense=response.data;
-        if(formData.id){
-          setExpenses(prev=>prev.map(expense=>expense.id===updatedExpense.id?updatedExpense:expense));
-       }
-       else{
-        setExpenses(prev=>[...prev,updatedExpense]);
-       }
-      } }catch (error) {
+        const newExpense=response.data;
+        setExpenses(prev=>[...prev,newExpense]);} 
+        setShowExpenseList(true);
+        setShowForm(false);
+       
+      }catch (error) {
         console.error('Error saving expense data:', error);
       }
     }
@@ -86,7 +99,7 @@ const Expense = () => {
 
       const expenseToEdit = response.data;
       setFormData(expenseToEdit);
-      setExpenses((prev) => prev.filter((expense) => expense.id !== id));
+     // setExpenses((prev) => prev.filter((expense) => expense.id !== id));
       setShowForm(true);
       setShowExpenseList(false);
     } catch (error) {
@@ -110,8 +123,9 @@ const Expense = () => {
   };
 
   const handleBack = () => {
-    setShowExpenseList(false);
+    setShowExpenseList(true);
     setShowForm(false);
+    setFormData({ amount: '', category: '', date: '' });
   };
 
   const downloadCSV = () => {
@@ -127,7 +141,7 @@ const Expense = () => {
     <div className="p-6 relative">
       {/* Top Buttons */}
       <div className="flex justify-end gap-3 mb-4">
-        <button
+       { !showForm&&<button
           onClick={() => {
             setShowForm(true);
             setShowExpenseList(false);
@@ -136,19 +150,29 @@ const Expense = () => {
         >
           <PlusCircle size={18} />
           Add Expense
-        </button>
-        <button
+        </button>}
+        {showExpenseList && (
+          <button
+            onClick={downloadCSV}
+            className={gradientButtonClass}
+          >
+            <Download size={18} />
+            Download Expense
+          </button>
+        )}
+        {!showExpenseList && showForm && (<button
           onClick={viewExpense}
           className={gradientButtonClass}
         >
           <Eye size={18} />
           View Expense
-        </button>
+        </button>)}
       </div>
 
       {/* Expense Form */}
       {showForm && !showExpenseList && (
-        <div className="max-w-md mx-auto bg-white mt-10 shadow-lg rounded-lg p-6 space-y-4">
+        
+        <div className="max-w-md mx-auto bg-white mt-10 shadow-lg rounded-lg p-6 space-y-4">    
           <h2 className="text-xl font-bold mb-2 text-center">Add Expense</h2>
           <input
             type="number"
@@ -196,13 +220,7 @@ const Expense = () => {
         <div className="mt-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-bold">Expense Records</h2>
-            <button
-              onClick={handleBack}
-              className="flex items-center text-sm text-blue-600 hover:underline"
-            >
-              <ArrowLeft size={16} />
-              Back
-            </button>
+           
           </div>
 
           {expenses.length === 0 ? (
@@ -250,17 +268,7 @@ const Expense = () => {
       )}
 
       {/* Download Button */}
-      {showExpenseList && (
-        <div className="mt-6 flex justify-end">
-                        <button
-                          onClick={downloadCSV}
-                          className={gradientButtonClass}
-                        >
-                          <Download size={18} />
-                          Download Expense
-                        </button>
-                      </div>
-      )}
+      
     </div>
   );
 };

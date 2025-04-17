@@ -32,6 +32,7 @@ const getIncome = async (req, res) => {
 // Update Income
 const updateIncome = async (req, res) => {
   const { id } = req.params;
+
   const { source, amount, date } = req.body;
   try {
     const query = `UPDATE incomes

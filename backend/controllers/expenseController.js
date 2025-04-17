@@ -31,13 +31,13 @@ const getExpense = async (req, res) => {
 // Update Expense
 const updateExpense = async (req, res) => {
   const { id } = req.params;
-  const { category, description, amount, date } = req.body;
+  const { category, amount, date } = req.body;
   try {
     const query = `UPDATE expenses
-                   SET category = $1, description = $2, amount = $3, date = $4
-                   WHERE id = $5
+                   SET category = $1, amount = $2, date = $3
+                   WHERE id = $4
                    RETURNING *`;
-    const values = [category, description, amount, date, id];
+    const values = [category,  amount, date, id];
     const result = await pool.query(query, values);
     if (result.rows.length === 0) return res.status(404).json({ error: 'Expense not found' });
     res.json(result.rows[0]);

@@ -15,9 +15,7 @@ const RequestChatbot = () => {
     try {
       const response = await axios.post(`http://localhost:5000/api/requests/`, {
         user_id: userId,
-        request_type: 'chatbot_access', headers: {
-          Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-        },
+        request_type: 'chatbot_access',
       });
       setRequestStatus('Your request has been submitted successfully.');
       setButtonDisabled(true);

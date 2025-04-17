@@ -3,7 +3,7 @@ const router=express.Router();
 const authMiddleware=require('../middleware/authMiddleware')
 const {createRequest,updateRequest,getRequests}=require('../controllers/requestController')
 
-router.post('/',authMiddleware,createRequest);
+router.post('/',createRequest);
 router.put('/:id',updateRequest);
 router.get('/',getRequests);
 

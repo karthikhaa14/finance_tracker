@@ -9,13 +9,14 @@ import {
 } from 'recharts';
 import { useOutletContext } from 'react-router-dom';
 
-const COLORS = ['#4F83CC', '#6B7280', '#10B981', '#F59E0B', '#EF4444']; // More neutral, professional colors
+const COLORS = ['#4F83CC', '#6B7280', '#10B981', '#F59E0B', '#EF4444']; 
 
 const Dashboard = () => {
   const { userId } = useOutletContext();
   const [incomeData, setIncomeData] = useState([]);
   const [expenseData, setExpenseData] = useState([]);
-
+  const [loading, setLoading] = useState(true);
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -30,6 +31,7 @@ const Dashboard = () => {
       } catch (err) {
         console.error(err);
       }
+      setLoading(false);
     };
     fetchData();
   }, [userId]);
@@ -58,7 +60,16 @@ const Dashboard = () => {
     .sort((a, b) => new Date(b.date) - new Date(a.date))
     .slice(0, 10);
 
+ if(loading){
+  return(
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="loader">Loading.....</div>
+    </div>
+  );
+ }
+
   return (
+    
     <div className="p-6 space-y-8 bg-gray-50 min-h-screen">
 
       {/* Summary Card */}
